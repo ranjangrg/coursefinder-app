@@ -1,5 +1,6 @@
 import { CourseData } from "@/app/types/Course";
 import { NextRequest, NextResponse } from "next/server";
+import { start } from "repl";
 
 const courses: CourseData[] = [
     {
@@ -89,6 +90,7 @@ const courses: CourseData[] = [
 ];
 
 export async function GET(request: NextRequest) {
+    // get course by id
     const searchParams = request.nextUrl.searchParams;
     const courseId = searchParams.get("id");
     if (courseId) {
@@ -111,5 +113,26 @@ export async function GET(request: NextRequest) {
         return NextResponse.json( filteredCourses );
     }
 
+    let _pageIdx = searchParams.get("page");
+    if (_pageIdx) {
+        // get paginated courses list
+        const totalCount = courses.length;  // make sure courses list is not null or empty
+        const pageIdx = parseInt(_pageIdx!, 10);
+        let pageSize = 5; // default pageSize
+        const _pageSize = searchParams.get("pageSize");
+        if (_pageSize) {
+            pageSize = parseInt(_pageSize!, 10);
+        }
+        const pageCount = Math.ceil(totalCount / pageSize);
+        const startIdx = (pageIdx - 1) * pageSize;
+        if ((startIdx < 0) || (startIdx >= totalCount)) {
+            return new NextResponse(`Invalid page provided`, { status: 404 })
+        }
+        const endIdx = Math.min(startIdx + pageSize, totalCount);
+        const filteredCourses = courses.slice(startIdx, endIdx);
+        return NextResponse.json( filteredCourses );
+    }
+
+    // return ALL courses
     return NextResponse.json(courses);
 }
