@@ -1,6 +1,5 @@
 import { CourseData } from "@/app/types/Course";
 import { NextRequest, NextResponse } from "next/server";
-import { start } from "repl";
 
 const courses: CourseData[] = [
     {
@@ -113,7 +112,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json( filteredCourses );
     }
 
-    let _pageIdx = searchParams.get("page");
+    const _pageIdx = searchParams.get("page");
     if (_pageIdx) {
         // get paginated courses list
         const totalCount = courses.length;  // make sure courses list is not null or empty
